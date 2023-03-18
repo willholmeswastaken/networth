@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["darwin", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Example {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Necessary for Next auth
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Income {
+  id     String  @id @unique @default(cuid())
+  Name   String
+  Amount Decimal
+  User   User    @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model User {
+  id              String            @id
+  name            String?
+  email           String?           @unique
+  emailVerified   DateTime?
+  image           String?
+  accounts        Account[]
+  sessions        Session[]
+  Income          Income[]
+  Overheads       Overheads[]
+  BankAccount     BankAccount[]
+  Asset           Asset[]
+  Liability       Liability[]
+  BudgetingPeriod BudgetingPeriod[]
+  SpendingAccount SpendingAccount[]
+  Allocation      Allocation[]
+  SavingsPlan     SavingsPlan[]
+}
+
+model Overheads {
+  id            String           @id @unique @default(cuid())
+  name          String
+  amount        Decimal
+  type          TransactionType?
+  user          User             @relation(fields: [userId], references: [id])
+  debitingBank  BankAccount      @relation(fields: [bankAccountId], references: [id])
+  userId        String
+  bankAccountId String
+}
+
+model BankAccount {
+  id        String      @id @unique @default(cuid())
+  name      String
+  user      User        @relation(fields: [userId], references: [id])
+  overheads Overheads[]
+  userId    String
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Asset {
+  id          String        @id @unique @default(cuid())
+  name        String
+  amount      Decimal
+  user        User          @relation(fields: [userId], references: [id])
+  type        AssetType?
+  userId      String
+  savingsPlan SavingsPlan[]
+}
+
+model Liability {
+  id     String        @id @unique @default(cuid())
+  name   String
+  amount Decimal
+  type   LiabilityType
+  user   User          @relation(fields: [userId], references: [id])
+  isPaid Boolean       @default(false)
+  userId String
+}
+
+model BudgetingPeriod {
+  id     String   @id @unique @default(cuid())
+  from   DateTime
+  to     DateTime
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model SpendingAccount {
+  id     String              @id @unique @default(cuid())
+  name   String
+  amount Decimal
+  user   User                @relation(fields: [userId], references: [id])
+  isPaid Boolean             @default(true)
+  type   SpendingAccountType
+  userId String
+}
+
+model Allocation {
+  id     String         @id @unique @default(cuid())
+  name   String
+  amount Decimal
+  type   AllocationType
+  user   User           @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model SavingsPlan {
+  id      String  @id @unique @default(cuid())
+  asset   Asset   @relation(fields: [assetId], references: [id])
+  amount  Decimal
+  user    User    @relation(fields: [userId], references: [id])
+  assetId String
+  userId  String
+}
+
+enum TransactionType {
+  Asset
+  Expense
+  Liability
+}
+
+enum AssetType {
+  Cash
+  Investments
+  Retirement
+  SecretCash
+}
+
+enum LiabilityType {
+  Loan
+  CreditCard
+  Overdraft
+}
+
+enum SpendingAccountType {
+  CurrentAccount
+  CreditCard
+}
+
+enum AllocationType {
+  Bills
+  Savings
+  Spending
+}
