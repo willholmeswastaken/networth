@@ -1,18 +1,11 @@
-import { type Asset, Prisma, type Liability, LiabilityType } from '@prisma/client'
+import { type Liability } from '@prisma/client'
 import { createColumnHelper } from '@tanstack/react-table';
 import ActionableTable from './ActionableTable';
+import { Card, Title, Button } from '@tremor/react';
+import { api } from '~/utils/api';
 
 const LiabilitiesSection = () => {
-    const liabilities: Liability[] = [
-        {
-            id: '1',
-            name: 'Mortgage',
-            amount: new Prisma.Decimal(1000),
-            type: LiabilityType.CreditCard,
-            userId: '1',
-            isPaid: false,
-        }
-    ];
+    const liabilities = api.liability.getLiabilities.useQuery();
     const columnHelper = createColumnHelper<Liability>()
     const columns = [
         columnHelper.accessor('name', {
@@ -30,8 +23,13 @@ const LiabilitiesSection = () => {
     ]
     return (
         <div className="flex flex-col gap-y-4 overflow-x-auto w-full">
-            <ActionableTable<Liability> data={liabilities} columns={columns} />
-            <button className="btn btn-primary">Add new liability</button>
+            <Card>
+                <div className="flex flex-row">
+                    <Title className='flex-1'>Liabilities</Title>
+                    <Button size='xs'>Add liability</Button>
+                </div>
+                <ActionableTable<Liability> data={liabilities.data ?? []} columns={columns} />
+            </Card>
         </div>
     )
 }

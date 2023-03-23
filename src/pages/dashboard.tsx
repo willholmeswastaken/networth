@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
+import { Card, Metric, Text } from "@tremor/react";
 import { type NextPage } from "next";
+import AccountFigures from "~/components/AccountFigures";
 import AssetsSection from "~/components/AssetsSection";
 import Headline from "~/components/Headline";
 import LiabilitiesSection from "~/components/LiabilitiesSection";
@@ -54,21 +56,10 @@ const Dashboard: NextPage = () => {
         <>
             <main className="w-full h-full text-white">
                 <div className="flex flex-col gap-y-4">
-                    <div className="flex flex-col gap-y-6 sm:gap-y-0 sm:flex-row sm:gap-x-6">
-                        <Headline title="Total Savings" amount="£44,000" />
-                        <Headline title="Total Debt" amount="£12,000" />
-                        <Headline title="Net Worth" amount="£32,000" />
-                    </div>
-                    <div className="flex flex-col gap-y-4">
-                        <div className="tabs tabs-boxed self-center">
-                            <a className="tab tab-active">Portfolio</a>
-                            <a className="tab">Income & Expenses</a>
-                            <a className="tab">Spending</a>
-                        </div>
-                        <div className="flex flex-row gap-x-4">
-                            <AssetsSection />
-                            <LiabilitiesSection />
-                        </div>
+                    <AccountFigures />
+                    <div className="flex flex-col gap-y-4 sm:flex-row sm:gap-x-4 h-full">
+                        <AssetsSection />
+                        <LiabilitiesSection />
                     </div>
                 </div>
             </main>

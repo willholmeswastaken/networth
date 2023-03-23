@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
-export const assetRouter = createTRPCRouter({
-  getAssets: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.asset.findMany({
+export const liabilityRouter = createTRPCRouter({
+  getLiabilities: protectedProcedure.query(({ ctx }) => {
+    return ctx.prisma.liability.findMany({
       where: {
         userId: ctx.session.user.id,
       },

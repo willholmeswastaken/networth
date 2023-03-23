@@ -1,11 +1,18 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
-import { useSession } from 'next-auth/react';
-import React, { useMemo, useState } from 'react'
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { useMemo, useState } from 'react'
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { data: sessionData } = useSession();
     const isLoggedIn = useMemo<boolean>(() => sessionData?.user ? true : false, [sessionData?.user]);
+
+    const onSignOut = () => {
+        signOut({ callbackUrl: window.location.origin }).catch((err) => { console.error(err) });
+    };
+    const onSignIn = () => {
+        signIn(undefined, { callbackUrl: `${window.location.origin}/books` }).catch((err) => { console.error(err) });
+    }
 
     // TODO: Conditionally render different items dependent on whether the user is logged in or not
 
@@ -23,19 +30,23 @@ const Header = () => {
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-4">
-                            <a
-                                href="/"
-                                className="text-white hover:text-gray-400 transition ease-in-out duration-200 px-3 py-2 rounded-md text-md"
-                            >
-                                Log In
-                            </a>
-
-                            <a
-                                href="/"
-                                className="btn btn-success"
-                            >
-                                Sign Up
-                            </a>
+                            {
+                                isLoggedIn ? (
+                                    <button
+                                        className="text-white hover:text-gray-400 transition ease-in-out duration-200 px-3 py-2 rounded-md text-md"
+                                        onClick={onSignOut}
+                                    >
+                                        Log Out
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="text-white hover:text-gray-400 transition ease-in-out duration-200 px-3 py-2 rounded-md text-md"
+                                        onClick={onSignIn}
+                                    >
+                                        Log In
+                                    </button>
+                                )
+                            }
                         </div>
                     </div>
                     <div className="md:hidden">
